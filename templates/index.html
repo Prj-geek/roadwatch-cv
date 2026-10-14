@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RoadWatch CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="RoadWatch home">
+        <span class="brand-mark">RW</span>
+        <span>RoadWatch <b>CV</b></span>
+      </a>
+      <span class="lab-badge">Computer Vision Laboratory</span>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">TRAFFIC VIDEO INTELLIGENCE</p>
+          <h1>Measure motion.<br><span>Reveal violations.</span></h1>
+          <p class="intro">Analyze fixed-camera traffic footage with transparent computer-vision methods. Track movement, estimate speed, and export evidence without sending video to a cloud service.</p>
+        </div>
+        <div class="pipeline" aria-label="Analysis pipeline">
+          <span>Detect</span><i></i><span>Track</span><i></i><span>Measure</span><i></i><span>Report</span>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="analysis-form" class="control-panel">
+          <div class="section-heading"><span>01</span><div><h2>Analysis setup</h2><p>Use footage from a stationary camera.</p></div></div>
+
+          <label class="dropzone" id="dropzone">
+            <input id="video" name="video" type="file" accept="video/mp4,video/x-msvideo,video/quicktime,video/x-matroska" required>
+            <span class="upload-icon">↑</span>
+            <strong id="file-label">Drop a traffic video here</strong>
+            <small>or click to browse · MP4, AVI, MOV, MKV · max 500 MB</small>
+          </label>
+
+          <section class="calibration" id="calibration" aria-label="Road calibration">
+            <div class="calibration-title"><div><strong>Assisted road calibration</strong><small>Click four road corners in order: far left, far right, near right, near left.</small></div><button type="button" id="reset-corners">Reset</button></div>
+            <video id="preview-video" class="hidden" muted playsinline></video>
+            <canvas id="preview-canvas" class="preview-canvas" aria-label="Click the four road boundary corners"></canvas>
+            <p class="corner-status" id="corner-status">Upload a video to preview it and mark the road. Review the overlay before continuing.</p>
+            <input type="hidden" name="road_corners" id="road-corners" value="[]">
+          </section>
+
+          <div class="form-grid">
+            <label><span>Speed limit</span><div class="input-unit"><input name="speed_limit" type="number" value="50" min="1" max="200" step="1" required><em>km/h</em></div></label>
+            <label><span>Lane count (width estimate)</span><select id="lane-count"><option value="1">1 lane</option><option value="2" selected>2 lanes</option><option value="3">3 lanes</option><option value="4">4 lanes</option><option value="5">5 lanes</option><option value="6">6 lanes</option></select></label>
+            <label><span>Estimated road width</span><div class="input-unit"><input name="road_width_m" id="road-width" type="number" value="7" min="1" max="30" step="0.1" required><em>metres</em></div></label>
+            <label class="wide"><span>Known distance along the road you marked</span><div class="input-unit"><input name="road_length_m" type="number" value="" placeholder="Measure or identify a known distance" min="2" max="500" step="0.5" required><em>metres</em></div><small class="field-help">This is the one real-world measurement needed for speed. Width is suggested as 3.5 m per lane and can be corrected; it is not used to inflate speed during lane changes.</small></label>
+            <label><span>Expected travel</span><select name="expected_direction"><option value="forward">Far end → near end</option><option value="reverse">Near end → far end</option></select></label>
+          </div>
+
+          <button class="primary" type="submit"><span>Start analysis</span><b>→</b></button>
+          <p class="fine-print">Assisted calibration estimates width from lane count (3.5 m/lane); confirm or edit it. Enter the known longitudinal distance in the marked area to set speed scale. Marked boundaries are still reviewed manually. Educational estimates only.</p>
+        </form>
+
+        <section class="results-panel">
+          <div class="section-heading"><span>02</span><div><h2>Run monitor</h2><p id="status-copy">Configure an analysis to begin.</p></div></div>
+          <div class="monitor" id="monitor">
+            <div class="empty-state" id="empty-state">
+              <div class="radar"><span></span></div>
+              <strong>Awaiting video</strong>
+              <p>Your run status and evidence summary will appear here.</p>
+            </div>
+            <div class="active-state hidden" id="active-state">
+              <div class="progress-row"><strong id="progress-label">Preparing</strong><span id="progress-value">0%</span></div>
+              <div class="progress-track"><div id="progress-bar"></div></div>
+              <div class="metrics">
+                <article><span>Vehicles</span><strong id="vehicles">—</strong></article>
+                <article><span>Events</span><strong id="events">0</strong></article>
+                <article><span>Duration</span><strong id="duration">—</strong></article>
+              </div>
+              <div class="downloads hidden" id="downloads">
+                <a id="video-download" href="#">Download annotated video</a>
+                <a id="report-download" href="#">Download CSV evidence</a>
+              </div>
+            </div>
+          </div>
+          <div class="method-note"><b>Method</b><p>YOLO vehicle detection → ByteTrack identity tracking → four-point road-plane mapping → windowed speed estimate → persistent violation rules.</p></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
+
