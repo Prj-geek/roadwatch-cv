@@ -1,49 +1,47 @@
-# RoadWatch CV
+## Install and Run
 
-RoadWatch CV is an educational traffic-video analysis project for a Principles of Computer Vision laboratory. It detects vehicles with YOLO, associates detections with ByteTrack, maps their positions onto a calibrated road plane, estimates speed over a stable trajectory window, and records sustained overspeeding or wrong-way events.
+### Prerequisites
 
-## Install and run
+- Windows 10/11
+- Python 3.10 installed
+- Internet connection for the initial model download
+
+### Setup
+
+Run these commands in PowerShell from the project root:
 
 ```powershell
-python -m venv .venv
+# Create a virtual environment using Python 3.10
+py -3.10 -m venv .venv
+
+# Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install project dependencies
 python -m pip install -r requirements.txt
+
+# Start the application
 python app.py
 ```
 
-Open `http://127.0.0.1:5000`. On the first analysis, Ultralytics downloads its small `yolo11n.pt` model weights. The first run therefore needs internet access; later runs use the local cached weights. Inference currently runs on CPU.
+Open **http://127.0.0.1:5000** in your browser.
 
-## Prepare and calibrate a video
+On the first analysis, Ultralytics downloads the `yolo11n.pt` model weights. An internet connection is required for this initial download. Later runs use the locally cached weights. Inference currently runs on CPU.
 
-Use a fixed-camera video with a clear road area. Select the video in the dashboard and mark the road corners in this order:
+### Running the Project Again
 
-1. Far-left corner
-2. Far-right corner
-3. Near-right corner
-4. Near-left corner
+Whenever you open a new PowerShell terminal, run:
 
-Review the four marked corners in the preview. Enter the known distance along the road between the far and near boundaries; this is the real-world scale reference used for speed. Road width is suggested as 3.5 m per lane from the lane-count selector and can be edited. The speed calculation uses longitudinal displacement, so lane changes do not add artificial speed. Choose whether the expected traffic travels from the far end toward the near end or in reverse.
+```powershell
+.\.venv\Scripts\Activate.ps1
+python app.py
+```
 
-The lane-width value is only a typical-width suggestion, not a measurement from the video. The app does not automatically recognize road boundaries; corner selection remains a user-reviewed step. Use a straight, approximately planar road and a reliable known longitudinal distance for the best result.
+### Troubleshooting
 
-For the best lab demonstration, use a 10–30 second clip, keep the selected calibration area within one continuous stretch of road, and choose two physical dimensions that you can reasonably estimate from lane markings. Speed estimates depend on those measurements. Inspect annotated tracks before discussing any alert.
-
-## What the system measures
-
-- Vehicle classes: car, motorcycle, bus, and truck
-- Persistent IDs from ByteTrack
-- Road-plane positions from the four-point perspective transform
-- Speed smoothed over approximately 0.8 seconds of track history
-- Overspeed and wrong-way events after a stable observation period
-- Annotated MP4 and downloadable CSV evidence, including a row per tracked vehicle even when no violations occur
-
-## Limitations
-
-- The camera should remain stationary, and the road should be approximately planar.
-- Approximate longitudinal distance produces approximate speeds; the suggested width is not guaranteed to match the real road and results are not suitable for legal enforcement.
-- Occlusion, dense traffic, unusual camera angles, or poor lighting can still break detections or tracks.
-- Wrong-way checks assume the marked region is one-way in the selected direction.
-
-## Academic and reuse note
-
-This implementation was written independently. The project idea was informed by common traffic-analysis approaches and the public description of `ArcadiusOP/Machine-vision-project`; no source files were copied. Describe your own contribution accurately if you submit or publish this work.
+- If Python 3.10 is not found, install it before running the setup commands.
+- If PowerShell blocks activation, review your script execution policy or activate the environment through Command Prompt.
+- If dependencies fail to install, check the error output before starting the application.
